@@ -35,12 +35,8 @@ find_package(ros2_mscl_msgs REQUIRED)
 
 
 find_library(MSCL_LIB_PATH NAMES libmscl.so PATHS "/usr/share/c++-mscl" DOC "MSCL Library" NO_DEFAULT_PATH)
-#find_library(MSCL_LIB_PATH NAMES libmscl.so PATHS "/usr/lib" DOC "MSCL Library" NO_DEFAULT_PATH)
-#find_library(BOOST_LIB_PATH NAMES libboost_chrono.so PATHS "/usr/share/c++-mscl/Boost/lib" NO_DEFAULT_PATH)
 set(MSCL_INC_PATH "/usr/share/c++-mscl/source")
-#set(BOOST_INC_PATH "/usr/share/c++-mscl/Boost/include")
 set(MSCL_LIB "/usr/share/c++-mscl")
-#set(CMAKE_BUILD_RPATH "${MSCL_LIB}")
 
 set(srv_files
   "srv/DeviceSettings.srv"
@@ -130,19 +126,10 @@ ament_package()
 include_directories(${CMAKE_SOURCE_DIR}/include/ros2_mscl ${MIPLIBINC} ${MIPUTILINC} ${MSCL_INC_PATH} ${MSCL_LIB} ${MSCL_INC})
 
 # Executables/Linking
- 
 add_executable(ros2_mscl_node src/microstrain_3dm.cpp src/microstrain_3dm_node.cpp)
 ament_target_dependencies(ros2_mscl_node rclcpp rclcpp_lifecycle std_msgs std_srvs lifecycle_msgs sensor_msgs geometry_msgs nav_msgs tf2 tf2_ros tf2_geometry_msgs ros2_mscl_msgs) 
 rosidl_target_interfaces(ros2_mscl_node ${PROJECT_NAME} "rosidl_typesupport_cpp")
 target_link_libraries(ros2_mscl_node ${MSCL_LIB_PATH})
-#target_link_libraries(ros2_mscl_node ${MSCL_LIB})
-
-#target_link_libraries(ros2_mscl_node "-Wl,-rpath=${MSCL_LIB}" ${MSCL_LIB_PATH})
-#add_library(ros2_mscl SHARED src/microstrain_3dm.cpp)
-#add_library(ros2_mscl_node SHARED IMPORTED)
-#set_property(TARGET ros2_mscl_node PROPERTY IMPORTED_LOCATION ${MSCL_LIB}/libmscl.so)
-
-message(${MSCL_LIB_PATH})
 
 #############
 ## Install ##

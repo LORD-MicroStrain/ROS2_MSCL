@@ -1327,7 +1327,7 @@ bool Microstrain::configure_node()
     //IMU Gyro bias capture service
     if (m_inertial_device->features().supportsCommand(mscl::MipTypes::Command::CMD_CAP_GYRO_BIAS))
     {
-      m_gyro_bias_capture_service = this->create_service<std_srvs::srv::Empty>("gyro_bias_capture", std::bind(&Microstrain::gyro_bias_capture, this, std::placeholders::_1, std::placeholders::_2));
+      m_gyro_bias_capture_service = this->create_service<std_srvs::srv::Trigger>("gyro_bias_capture", std::bind(&Microstrain::gyro_bias_capture, this, std::placeholders::_1, std::placeholders::_2));
     }
    
     //IMU Mag Hard iron offset service
@@ -1340,8 +1340,8 @@ bool Microstrain::configure_node()
     //IMU Mag Soft iron matrix service
     if (m_inertial_device->features().supportsCommand(mscl::MipTypes::Command::CMD_MAG_SOFT_IRON_MATRIX))
     {
-      m_set_soft_iron_matrix_service = this->create_service<ros2_mscl::srv::GetSoftIronMatrix>("set_soft_iron_matrix", std::bind(&Microstrain::set_soft_iron_matrix, this, std::placeholders::_1, std::placeholders::_2));
-      m_get_soft_iron_matrix_service = this->create_service<ros2_mscl::srv::SetSoftIronMatrix>("get_soft_iron_matrix", std::bind(&Microstrain::get_soft_iron_matrix, this, std::placeholders::_1, std::placeholders::_2));
+      m_set_soft_iron_matrix_service = this->create_service<ros2_mscl::srv::SetSoftIronMatrix>("set_soft_iron_matrix", std::bind(&Microstrain::set_soft_iron_matrix, this, std::placeholders::_1, std::placeholders::_2));
+      m_get_soft_iron_matrix_service = this->create_service<ros2_mscl::srv::GetSoftIronMatrix>("get_soft_iron_matrix", std::bind(&Microstrain::get_soft_iron_matrix, this, std::placeholders::_1, std::placeholders::_2));
     }
 
     //IMU Coning and sculling enable service
@@ -1386,13 +1386,13 @@ bool Microstrain::configure_node()
     //Kalman filter commanded ZUPT service
     if (m_inertial_device->features().supportsCommand(mscl::MipTypes::Command::CMD_EF_CMDED_ZERO_VEL_UPDATE))
     {
-      m_commanded_vel_zupt_service = this->create_service<std_srvs::srv::Empty>("commanded_vel_zupt", std::bind(&Microstrain::commanded_vel_zupt, this, std::placeholders::_1, std::placeholders::_2));
+      m_commanded_vel_zupt_service = this->create_service<std_srvs::srv::Trigger>("commanded_vel_zupt", std::bind(&Microstrain::commanded_vel_zupt, this, std::placeholders::_1, std::placeholders::_2));
     }
     
     //Kalman filter commanded angular ZUPT service
     if (m_inertial_device->features().supportsCommand(mscl::MipTypes::Command::CMD_EF_CMDED_ZERO_ANG_RATE_UPDATE))
     {
-      m_commanded_ang_rate_zupt_service = this->create_service<std_srvs::srv::Empty>("commanded_ang_rate_zupt", std::bind(&Microstrain::commanded_ang_rate_zupt, this, std::placeholders::_1, std::placeholders::_2));
+      m_commanded_ang_rate_zupt_service = this->create_service<std_srvs::srv::Trigger>("commanded_ang_rate_zupt", std::bind(&Microstrain::commanded_ang_rate_zupt, this, std::placeholders::_1, std::placeholders::_2));
     }
 
     //Kalman filter Accel white noise 1-sigma service
@@ -2904,6 +2904,7 @@ void Microstrain::reset_filter(const std::shared_ptr<std_srvs::srv::Empty::Reque
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // Initialize Filter (Euler Angles) Service
 /////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void Microstrain::init_filter_euler(const std::shared_ptr<ros2_mscl::srv::InitFilterEuler::Request> req, 
                                     std::shared_ptr<ros2_mscl::srv::InitFilterEuler::Response> res)
 {
@@ -2914,9 +2915,9 @@ void Microstrain::init_filter_euler(const std::shared_ptr<ros2_mscl::srv::InitFi
   {
     try
     {
-      mscl::EulerAngles attitude(req.angle.x,
-                                 req.angle.y,
-                                 req.angle.z);
+      mscl::EulerAngles attitude(req->angle.x,
+                                 req->angle.y,
+                                 req->angle.z);
 
       m_inertial_device->setInitialAttitude(attitude);
       res->success = true;
@@ -2933,8 +2934,8 @@ void Microstrain::init_filter_euler(const std::shared_ptr<ros2_mscl::srv::InitFi
 // Initialize Filter (Heading Angle) Service
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Microstrain::init_filter_euler(const std::shared_ptr<ros2_mscl::srv::InitFilterEuler::Request> req, 
-                                    std::shared_ptr<ros2_mscl::srv::InitFilterEuler::Response> res)
+void Microstrain::init_filter_heading(const std::shared_ptr<ros2_mscl::srv::InitFilterHeading::Request> req, 
+                                      std::shared_ptr<ros2_mscl::srv::InitFilterHeading::Response> res)
 {
   res->success = false;
 
@@ -2943,7 +2944,7 @@ void Microstrain::init_filter_euler(const std::shared_ptr<ros2_mscl::srv::InitFi
     try
     {
       RCLCPP_INFO(this->get_logger(), "Initializing the Filter with a heading angle\n");
-      m_inertial_device->setInitialHeading(req.angle);
+      m_inertial_device->setInitialHeading(req->angle);
 
       res->success = true;
     }
@@ -3128,7 +3129,6 @@ void Microstrain::gyro_bias_capture(const std::shared_ptr<std_srvs::srv::Trigger
     }
   }
 }
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // Set Hard Iron Offset Service
@@ -3383,7 +3383,7 @@ void Microstrain::set_heading_source(const std::shared_ptr<ros2_mscl::srv::SetHe
   {
     try
     {
-      mscl::InertialTypes::HeadingUpdateEnableOption source = static_cast<mscl::InertialTypes::HeadingUpdateEnableOption>(req->headingSource);
+      mscl::InertialTypes::HeadingUpdateEnableOption source = static_cast<mscl::InertialTypes::HeadingUpdateEnableOption>(req->heading_source);
       
       for(mscl::HeadingUpdateOptions headingSources : m_inertial_device->features().supportedHeadingUpdateOptions())
       {
@@ -3576,9 +3576,7 @@ void Microstrain::get_sensor2vehicle_transformation(const std::shared_ptr<ros2_m
   res->success = false;
 
   if(!m_inertial_device)
-  {
-    return res->success;
-  }
+    return;
 
   try
   {
@@ -3594,7 +3592,7 @@ void Microstrain::get_sensor2vehicle_transformation(const std::shared_ptr<ros2_m
     //set rotational components from the device-stored values 
     tf2::Quaternion quat;
     quat.setRPY(rotation.roll(), rotation.pitch(), rotation.yaw());
-    tf2::convert(quat, res.rotation);
+    tf2::convert(quat, res->rotation);
 
     res->success = true;
   }
@@ -3682,7 +3680,7 @@ void Microstrain::set_coning_sculling_comp(const std::shared_ptr<ros2_mscl::srv:
   {
     try
     {
-      RCLCPP_INFO(this->get_logger(), "%s Coning and Sculling compensation", req.enable ? "DISABLED" : "ENABLED\n");
+      RCLCPP_INFO(this->get_logger(), "%s Coning and Sculling compensation", req->enable ? "DISABLED" : "ENABLED\n");
       m_inertial_device->setConingAndScullingEnable(req->enable);
 
       RCLCPP_INFO(this->get_logger(), "Reading Coning and Sculling compensation enabled state:\n");
@@ -4068,7 +4066,6 @@ void Microstrain::get_zero_velocity_update_threshold(const std::shared_ptr<ros2_
     }
   }
 }
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 // Tare Orientation Service
@@ -4866,7 +4863,7 @@ void Microstrain::external_heading_update(const std::shared_ptr<ros2_mscl::srv::
 
       mscl::TimeUpdate timestamp(req->gps_tow, req->gps_week_number);
 
-      if(req.use_time)
+      if(req->use_time)
       {
         m_inertial_device->sendExternalHeadingUpdate(heading_data, timestamp);
         RCLCPP_INFO(this->get_logger(), "Sent External Heading update with timestamp.\n");
@@ -4892,7 +4889,7 @@ void Microstrain::external_heading_update(const std::shared_ptr<ros2_mscl::srv::
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Microstrain::set_relative_position_reference(const std::shared_ptr<ros2_mscl::srv::SetRelativePositionReference::Request> req, 
-                                                  ros2_mscl::srv::SetRelativePositionReference::Response> res)
+                                                  std::shared_ptr<ros2_mscl::srv::SetRelativePositionReference::Response> res)
 {
   res->success = false;
 
@@ -4927,7 +4924,7 @@ void Microstrain::set_relative_position_reference(const std::shared_ptr<ros2_msc
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Microstrain::get_relative_position_reference(const std::shared_ptr<ros2_mscl::srv::GetRelativePositionReference::Request> req, 
-                                                  ros2_mscl::srv::GetRelativePositionReference::Response> res)
+                                                  std::shared_ptr<ros2_mscl::srv::GetRelativePositionReference::Response> res)
 {
   res->success = false; 
 

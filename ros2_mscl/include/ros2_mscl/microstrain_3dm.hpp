@@ -73,14 +73,14 @@
 #include "ros2_mscl/srv/get_accel_bias_model.hpp"
 #include "ros2_mscl/srv/set_gravity_adaptive_vals.hpp"
 #include "ros2_mscl/srv/get_gravity_adaptive_vals.hpp"
-#include "ros2_mscl/srv/get_sensor2_vehicle_rotation.hpp"
+#include "ros2_mscl/srv/set_sensor2_vehicle_rotation.hpp"
 #include "ros2_mscl/srv/get_sensor2_vehicle_rotation.hpp"
 #include "ros2_mscl/srv/set_sensor2_vehicle_offset.hpp"
 #include "ros2_mscl/srv/get_sensor2_vehicle_offset.hpp"
 #include "ros2_mscl/srv/set_reference_position.hpp"
 #include "ros2_mscl/srv/get_reference_position.hpp"
 #include "ros2_mscl/srv/set_coning_sculling_comp.hpp"
-#include "ros2_mscl/srv/set_coning_sculling_comp.hpp"
+#include "ros2_mscl/srv/get_coning_sculling_comp.hpp"
 #include "ros2_mscl/srv/set_estimation_control_flags.hpp"
 #include "ros2_mscl/srv/get_estimation_control_flags.hpp"
 #include "ros2_mscl/srv/set_dynamics_mode.hpp"
@@ -259,8 +259,8 @@ namespace Microstrain
     
     void external_heading_update(const std::shared_ptr<ros2_mscl::srv::ExternalHeadingUpdate::Request> req, std::shared_ptr<ros2_mscl::srv::ExternalHeadingUpdate::Response> res);
 
-    void set_relative_position_reference(const std::shared_ptr<ros2_mscl::srv::SetRelativePositionReference::Request> req, ros2_mscl::srv::SetRelativePositionReference::Response> res);
-    void get_relative_position_reference(const std::shared_ptr<ros2_mscl::srv::GetRelativePositionReference::Request> req, ros2_mscl::srv::GetRelativePositionReference::Response> res);
+    void set_relative_position_reference(const std::shared_ptr<ros2_mscl::srv::SetRelativePositionReference::Request> req, std::shared_ptr<ros2_mscl::srv::SetRelativePositionReference::Response> res);
+    void get_relative_position_reference(const std::shared_ptr<ros2_mscl::srv::GetRelativePositionReference::Request> req, std::shared_ptr<ros2_mscl::srv::GetRelativePositionReference::Response> res);
 
     void device_settings(const std::shared_ptr<ros2_mscl::srv::DeviceSettings::Request> req, std::shared_ptr<ros2_mscl::srv::DeviceSettings::Response> res);
     
@@ -354,7 +354,7 @@ namespace Microstrain
   rclcpp::Service<ros2_mscl::srv::SetTareOrientation>::SharedPtr m_set_tare_orientation_service;
   rclcpp::Service<ros2_mscl::srv::SetComplementaryFilter>::SharedPtr m_set_complementary_filter_service;
   rclcpp::Service<ros2_mscl::srv::GetComplementaryFilter>::SharedPtr m_get_complementary_filter_service;
-  //rclcpp::Service<ros2_mscl::srv::SetSensor2VehicleRotation>::SharedPtr m_set_sensor2vehicle_rotation_service;
+  rclcpp::Service<ros2_mscl::srv::SetSensor2VehicleRotation>::SharedPtr m_set_sensor2vehicle_rotation_service;
   rclcpp::Service<ros2_mscl::srv::GetSensor2VehicleRotation>::SharedPtr m_get_sensor2vehicle_rotation_service;
   rclcpp::Service<ros2_mscl::srv::SetSensor2VehicleOffset>::SharedPtr m_set_sensor2vehicle_offset_service;
   rclcpp::Service<ros2_mscl::srv::GetSensor2VehicleOffset>::SharedPtr m_get_sensor2vehicle_offset_service;
@@ -366,13 +366,13 @@ namespace Microstrain
   rclcpp::Service<ros2_mscl::srv::SetGyroBias>::SharedPtr m_set_gyro_bias_service;
   rclcpp::Service<ros2_mscl::srv::GetGyroBias>::SharedPtr m_get_gyro_bias_service;
   
-  rclcpp::Service<std_srvs::srv::Empty>::SharedPtr m_gyro_bias_capture_service;
+  rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr m_gyro_bias_capture_service;
   rclcpp::Service<ros2_mscl::srv::SetHardIronValues>::SharedPtr m_set_hard_iron_values_service;
   rclcpp::Service<ros2_mscl::srv::GetHardIronValues>::SharedPtr m_get_hard_iron_values_service;
   rclcpp::Service<ros2_mscl::srv::GetSoftIronMatrix>::SharedPtr m_get_soft_iron_matrix_service;
   rclcpp::Service<ros2_mscl::srv::SetSoftIronMatrix>::SharedPtr m_set_soft_iron_matrix_service;
   rclcpp::Service<ros2_mscl::srv::SetConingScullingComp>::SharedPtr m_set_coning_sculling_comp_service;
-  //rclcpp::Service<ros2_mscl::srv::GetConingScullingComp>::SharedPtr m_get_coning_sculling_comp_service;
+  rclcpp::Service<ros2_mscl::srv::GetConingScullingComp>::SharedPtr m_get_coning_sculling_comp_service;
   rclcpp::Service<std_srvs::srv::Empty>::SharedPtr m_reset_filter_service;
   rclcpp::Service<ros2_mscl::srv::SetEstimationControlFlags>::SharedPtr m_set_estimation_control_flags_service;
   rclcpp::Service<ros2_mscl::srv::GetEstimationControlFlags>::SharedPtr m_get_estimation_control_flags_service;
@@ -380,8 +380,8 @@ namespace Microstrain
   rclcpp::Service<ros2_mscl::srv::InitFilterHeading>::SharedPtr m_init_filter_heading_service;
   rclcpp::Service<ros2_mscl::srv::SetHeadingSource>::SharedPtr m_set_heading_source_service;
   rclcpp::Service<ros2_mscl::srv::GetHeadingSource>::SharedPtr m_get_heading_source_service;
-  rclcpp::Service<std_srvs::srv::Empty>::SharedPtr m_commanded_vel_zupt_service;
-  rclcpp::Service<std_srvs::srv::Empty>::SharedPtr m_commanded_ang_rate_zupt_service;
+  rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr m_commanded_vel_zupt_service;
+  rclcpp::Service<std_srvs::srv::Trigger>::SharedPtr m_commanded_ang_rate_zupt_service;
   rclcpp::Service<ros2_mscl::srv::SetAccelNoise>::SharedPtr m_set_accel_noise_service;
   rclcpp::Service<ros2_mscl::srv::GetAccelNoise>::SharedPtr m_get_accel_noise_service;
   rclcpp::Service<ros2_mscl::srv::SetGyroNoise>::SharedPtr m_set_gyro_noise_service;

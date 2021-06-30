@@ -3,7 +3,7 @@
 IMPORTANT:  This is a beta release of the ROS2 driver!  Please report any issues via the [Github issues page](https://github.com/LORD-MicroStrain/ROS2_MSCL/issues)
 
 
-ROS2 Interface (driver) software for inertial sensors compatible with the [Microstrain Communication Library (MSCL)](https://github.com/LORD-MicroStrain/MSCL).
+This is the ROS2 Interface (driver) software for inertial sensors compatible with the [Microstrain Communication Library (MSCL)](https://github.com/LORD-MicroStrain/MSCL).
 
 MSCL is developed by [LORD Sensing - Microstrain](http://microstrain.com) in Williston, VT. 
 
@@ -25,11 +25,9 @@ If you choose to install MSCL at a location other than /usr/share, [CMakeLists.t
 #### Building from source
 1. Install ROS2 and create a workspace: [Configuring Your ROS2 Environment](https://docs.ros.org/en/foxy/Tutorials/Configuring-ROS2-Environment.html)
 
-2. Move the entire ROS2-MSCL folder (ros_mscl and mscl_msgs for just source) to the your_workspace/src directory.
+2. Move the entire ROS2-MSCL folder (ros_mscl and mscl_msgs) to the your_workspace/src directory.
 
-3. Locate and register the ros_mscl package: `rospack find ros_mscl`
-
-4. Build your workspace:
+3. Build your workspace:
         
         cd ~/your_workspace
         colcon make
@@ -41,7 +39,7 @@ The following command will launch the driver. Keep in mind each instance needs t
             
         ros2 launch ros_mscl microstrain_launch.py
 
-Optional launch parameters:
+Some optional launch parameters:
 - name: namespace the node will publish messages to, default: gx5
 - port: serial port name to connect to the device over, default: /dev/ttyACM0
 - baudrate: baud rate to open the connection with, default: 115200
@@ -51,10 +49,15 @@ To check published topics:
         
     ros2 topic list
 
-This driver implements a lifecycle node.  Upon running, the node will be in the unconfigured state.  The node must be transitioned as follows for data to be available:
+This driver is implemented as a lifecycle node.  Upon running, the node will be in the unconfigured state and no interaction has occurred with the device.  The node must be transitioned as follows for data to be available:
 
-- transition to configure state: $ ros2 lifecycle set /gx5 configure
-- transition to active state: $ ros2 lifecycle set /gx5 activate
+- transition to configure state: 
+
+        ros2 lifecycle set /gx5 configure
+
+- transition to active state: 
+
+        ros2 lifecycle set /gx5 activate
 
 You can stop data from streaming by putting the device into the "deactivate" state.  Both the "cleanup" and "shutdown" states will disconnect from the device and close the raw data log file (if enabled.)
 

@@ -43,6 +43,7 @@ build-shell: $(image_artifact)
 		-w $(docker_catkin_root) \
 		$(run_args) \
 		$(run_mounts) \
+		--device "/dev/ttyACM0" \
 		$$(cat $<)
 
 clean: $(image_artifact)
@@ -50,11 +51,11 @@ clean: $(image_artifact)
 		-it \
 		--rm \
 		-w $(docker_catkin_root) \
-    --entrypoint="/bin/bash" \
+		--entrypoint="/bin/bash" \
 		$(run_args) \
 		$(run_mounts) \
 		$$(cat $<) -c " \
-      chown -R $(shell id -u):$(shell id -g) $(docker_catkin_build_dir) $(docker_catkin_install_dir) $(docker_catkin_log_dir) \
+			chown -R $(shell id -u):$(shell id -g) $(docker_catkin_build_dir) $(docker_catkin_install_dir) $(docker_catkin_log_dir) \
 		"
 	@rm -rf "$(build_dir)" "$(install_dir)" "$(log_dir)"
 	@rm -f "$(image_artifact)"

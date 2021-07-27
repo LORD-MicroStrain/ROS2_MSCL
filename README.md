@@ -12,7 +12,7 @@ MSCL is developed by [LORD Sensing - Microstrain](http://microstrain.com) in Wil
 
 #### MSCL
 
-IMPORTANT: You will need to copy /usr/share/c++mscl/libmscl.so to /usr/lib manually for now as the ROS2 build environment cannot locate it.  We are looking into this.
+**IMPORTANT**: You will need to add the path `/usr/share/c++-mscl` to `LD_LIBRARY_PATH` like so: `export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/share/c++-mscl"`
 
 MSCL pre-built packages can be found here: [MSCL Packages](https://github.com/LORD-MicroStrain/MSCL/releases/tag/v62.0.0)
 
@@ -30,14 +30,14 @@ If you choose to install MSCL at a location other than /usr/share, [CMakeLists.t
 3. Build your workspace:
         
         cd ~/your_workspace
-        colcon make
+        colcon build
         source ~/your_workspace/install/setup.bash
    The source command may need to be run in each terminal prior to launching a ROS node.
 
 #### Launch the node and publish data
 The following command will launch the driver. Keep in mind each instance needs to be run in a separate terminal.
             
-        ros2 launch ros_mscl microstrain_launch.py
+        ros2 launch ros2_mscl microstrain_launch.py
 
 Some optional launch parameters:
 - name: namespace the node will publish messages to, default: gx5

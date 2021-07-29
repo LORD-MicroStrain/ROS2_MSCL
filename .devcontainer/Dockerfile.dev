@@ -6,8 +6,7 @@ FROM ${ARCH}/ros:${ROS_VERSION}-ros-base
 RUN set -ex \
     && apt-get update && apt-get install -y \
         gdb \
-        git \
-        libboost-dev
+        git
 
 # Install MSCL (github deb install is kind of a pain)
 ENV DEBIAN_FRONTEND="noninteractive"

@@ -37,7 +37,7 @@ If you choose to install MSCL at a location other than /usr/share, [CMakeLists.t
 #### Launch the node and publish data
 The following command will launch the driver. Keep in mind each instance needs to be run in a separate terminal.
             
-        ros2 launch ros_mscl microstrain_launch.py
+        ros2 launch ros2_mscl microstrain_launch.py
 
 Some optional launch parameters:
 - name: namespace the node will publish messages to, default: gx5

@@ -33,6 +33,8 @@ find_package(tf2_geometry_msgs REQUIRED)
 #find_package(diagnostic_updater REQUIRED)
 find_package(ros2_mscl_msgs REQUIRED)
 
+set(BOOST_ROOT "/usr/share/c++-mscl/Boost")
+find_package(Boost 1.68 REQUIRED)
 
 find_library(MSCL_LIB_PATH NAMES libmscl.so PATHS "/usr/share/c++-mscl" DOC "MSCL Library" NO_DEFAULT_PATH)
 set(MSCL_INC_PATH "/usr/share/c++-mscl/source")
@@ -123,7 +125,7 @@ ament_package()
 ###########
 
 
-include_directories(${CMAKE_SOURCE_DIR}/include/ros2_mscl ${MIPLIBINC} ${MIPUTILINC} ${MSCL_INC_PATH} ${MSCL_LIB} ${MSCL_INC})
+include_directories(${CMAKE_SOURCE_DIR}/include/ros2_mscl ${MIPLIBINC} ${MIPUTILINC} ${MSCL_INC_PATH} ${MSCL_LIB} ${MSCL_INC} ${Boost_INCLUDE_DIR})
 
 # Executables/Linking
 add_executable(ros2_mscl_node src/microstrain_3dm.cpp src/microstrain_3dm_node.cpp)

@@ -35,8 +35,10 @@ find_package(ros2_mscl_msgs REQUIRED)
 
 
 find_library(MSCL_LIB_PATH NAMES libmscl.so PATHS "/usr/share/c++-mscl" DOC "MSCL Library" NO_DEFAULT_PATH)
+find_library(BOOST_LIB_PATH NAMES libboost_chrono.so PATHS "/usr/share/c++-mscl/Boost/lib" NO_DEFAULT_PATH)
 set(MSCL_INC_PATH "/usr/share/c++-mscl/source")
 set(MSCL_LIB "/usr/share/c++-mscl")
+set(BOOST_INC_PATH "/usr/share/c++-mscl/Boost/include")
 
 set(srv_files
   "srv/DeviceSettings.srv"

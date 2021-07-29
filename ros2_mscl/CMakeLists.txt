@@ -140,9 +140,13 @@ target_link_libraries(ros2_mscl_node ${MSCL_LIB_PATH})
 
 install(TARGETS
   ros2_mscl_node
-  DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
   RUNTIME DESTINATION lib/${PROJECT_NAME}
+)
+
+install(DIRECTORY
+  launch
+  DESTINATION share/${PROJECT_NAME}/
 )
 
 #############

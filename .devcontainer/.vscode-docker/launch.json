@@ -9,7 +9,7 @@
             "request": "launch",
             "target": "/home/microstrain/src/ros2_mscl/launch/microstrain_launch.py",
             "type": "ros",
-            //"preLaunchTask": "build"
+            "preLaunchTask": "build"
         }
     ]
 }

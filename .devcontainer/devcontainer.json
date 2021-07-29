@@ -1,0 +1,34 @@
+{
+    "name": "amd64/ros2_mscl-dev:galactic",
+    "context": "..",
+    "dockerFile": "Dockerfile.dev",
+    "extensions": [
+        "ms-iot.vscode-ros",
+        "ms-vscode.cpptools",
+        "ms-python.python",
+        "ms-vscode.cmake-tools"
+    ],
+    "containerUser": "root",
+    "remoteUser": "microstrain",
+    "runArgs": [
+        "--privileged",
+        "--security-opt", "seccomp=unconfined"
+    ],
+    "settings": {
+        "terminal.integrated.profiles.linux": {
+            "bash": {
+                "path": "/ros_entrypoint.sh",
+                "args": ["/bin/bash"]
+            }
+        },
+        "terminal.integrated.defaultProfile.windows": "bash"
+    },
+    "mounts": [
+        "source=/dev,target=/dev,type=bind,consistency=cached",
+        "source=${localWorkspaceFolder}/ros2_mscl,target=/home/microstrain/src/ros2_mscl,type=bind,consistency=cached",
+        "source=${localWorkspaceFolder}/mscl_msgs,target=/home/microstrain/src/mscl_msgs,type=bind,consistency=cached",
+        "source=${localWorkspaceFolder}/.devcontainer/.vscode-docker,target=/home/microstrain/.vscode,type=bind,consistency=cached"
+    ],
+    "workspaceMount": "",
+    "workspaceFolder": "/home/microstrain"
+}

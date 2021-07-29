@@ -1,4 +1,13 @@
-FROM ros:galactic-ros-base-focal
+ARG ARCH="amd64"
+ARG ROS_VERSION="galactic"
+FROM ${ARCH}/ros:${ROS_VERSION}-ros-base
+
+# Install some dependencies used by the packages
+RUN set -ex \
+    && apt-get update && apt-get install -y \
+        gdb \
+        git \
+        libboost-dev
 
 # Install MSCL (github deb install is kind of a pain)
 ENV DEBIAN_FRONTEND="noninteractive"
@@ -6,7 +15,6 @@ RUN set -ex \
     && apt-get update && apt-get install -y \
         jq \
         curl \
-        libboost-dev \
     && install_github_deb () { \
         org="${1}"; \
         repo="${2}"; \
@@ -20,12 +28,24 @@ RUN set -ex \
     } \
     && install_github_deb "LORD-MicroStrain"  "MSCL" "v62.0.0" "c++-mscl_62.0.0_amd64.deb"
 
-# Add the library to LD_LIBRARY_PATH
-ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/share/c++-mscl"
-
 # Use rosdep to install the dependencies of the packages
 COPY ros2_mscl /tmp/src/ros2_mscl
 COPY mscl_msgs /tmp/src/mscl_msgs
 RUN set -ex \
     && rosdep install --from-paths /tmp/src --ignore-src -r -y \
     && rm -rf /tmp/src
+
+# Add a user that will be used when shelling into this container and allow them to use devices
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+RUN set -ex \
+    && groupadd -g ${USER_ID} microstrain \
+    && useradd -N -m -u ${USER_ID} -g ${GROUP_ID} -G "dialout" microstrain
+
+# Make the directory where we will mount all the files into
+USER microstrain
+RUN set -ex \
+    && mkdir -p ${HOME}/src
+
+# Add the MSCL path to LD_LIBRARY_PATH so that the linker can find it at runtime
+ENV LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/usr/share/c++-mscl"

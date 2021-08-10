@@ -20,7 +20,7 @@ We do our best to keep ROS2-MSCL up-to-date with the latest MSCL changes, but so
 
 Install instructions can be found here: [How to Use MSCL](https://github.com/LORD-MicroStrain/MSCL/blob/master/HowToUseMSCL.md#linux)
 
-If you choose to install MSCL at a location other than /usr/share, [CMakeLists.txt](https://github.com/LORD-MicroStrain/ROS2-MSCL/blob/master/CMakeLists.txt) will need to be updated with the install path.
+If you choose to install MSCL at a location other than /usr/share, [CMakeLists.txt](https://github.com/LORD-MicroStrain/ROS2_MSCL/blob/master/ros2_mscl/CMakeLists.txt) will need to be updated with the install path.
 
 #### Building from source
 1. Install ROS2 and create a workspace: [Configuring Your ROS2 Environment](https://docs.ros.org/en/foxy/Tutorials/Configuring-ROS2-Environment.html)

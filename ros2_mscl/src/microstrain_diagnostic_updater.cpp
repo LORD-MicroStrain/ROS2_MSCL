@@ -1,7 +1,7 @@
 #include "diagnostic_updater/diagnostic_updater.h"
 #include "diagnostic_updater/update_functions.h"
-#include "microstrain_diagnostic_updater.hpp"
-#include "microstrain_3dm.hpp"
+#include "ros2_mscl/microstrain_diagnostic_updater.hpp"
+#include "ros2_mscl/microstrain_3dm.hpp"
 #include <string>
 
 

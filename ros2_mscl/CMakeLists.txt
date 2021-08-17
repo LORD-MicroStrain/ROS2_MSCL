@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.5)
 project(ros2_mscl)
 
+# Locate the common code and messages
+set(COMMON_NAME "ros_mscl_common")
+set(COMMON_DIR "${${PROJECT_NAME}_SOURCE_DIR}/../${COMMON_NAME}")
+
+# Download and install MSCL
+include(${COMMON_DIR}/cmake/download_mscl.cmake)
+download_mscl(VERSION "62.0.0")
+
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
@@ -18,8 +26,6 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(lifecycle_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
-#find_package(roslint REQUIRED)
-#find_package(message_generation REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -30,76 +36,14 @@ find_package(std_srvs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
-#find_package(diagnostic_updater REQUIRED)
-find_package(ros2_mscl_msgs REQUIRED)
+find_package(mscl_msgs REQUIRED)
 
-set(BOOST_ROOT "/usr/share/c++-mscl/Boost")
-find_package(Boost 1.68 REQUIRED)
-
-find_library(MSCL_LIB_PATH NAMES libmscl.so PATHS "/usr/share/c++-mscl" DOC "MSCL Library" NO_DEFAULT_PATH)
-set(MSCL_INC_PATH "/usr/share/c++-mscl/source")
-set(MSCL_LIB "/usr/share/c++-mscl")
-
-set(srv_files
-  "srv/DeviceSettings.srv"
-  "srv/ExternalHeadingUpdate.srv"
-  "srv/GetAccelAdaptiveVals.srv"
-  "srv/GetAccelBias.srv"
-  "srv/GetAccelBiasModel.srv"
-  "srv/GetAccelNoise.srv"
-  "srv/GetComplementaryFilter.srv"
-  "srv/GetConingScullingComp.srv"
-  "srv/GetDynamicsMode.srv"
-  "srv/GetEstimationControlFlags.srv"
-  "srv/GetGravityAdaptiveVals.srv"
-  "srv/GetGyroBias.srv"
-  "srv/GetGyroBiasModel.srv"
-  "srv/GetGyroNoise.srv"
-  "srv/GetHardIronValues.srv"
-  "srv/GetHeadingSource.srv"
-  "srv/GetMagAdaptiveVals.srv"
-  "srv/GetMagDipAdaptiveVals.srv"
-  "srv/GetMagNoise.srv"
-  "srv/GetReferencePosition.srv"
-  "srv/GetRelativePositionReference.srv"
-  "srv/GetSensor2VehicleOffset.srv"
-  "srv/GetSensor2VehicleRotation.srv"
-  "srv/GetSensor2VehicleTransformation.srv"
-  "srv/GetSoftIronMatrix.srv"
-  "srv/GetTareOrientation.srv"
-  "srv/GetZeroAngleUpdateThreshold.srv"
-  "srv/GetZeroVelocityUpdateThreshold.srv"
-  "srv/InitFilterEuler.srv"
-  "srv/InitFilterHeading.srv"
-  "srv/SetAccelAdaptiveVals.srv"
-  "srv/SetAccelBias.srv"
-  "srv/SetAccelBiasModel.srv"
-  "srv/SetAccelNoise.srv"
-  "srv/SetComplementaryFilter.srv"
-  "srv/SetConingScullingComp.srv"
-  "srv/SetDynamicsMode.srv"
-  "srv/SetEstimationControlFlags.srv"
-  "srv/SetGravityAdaptiveVals.srv"
-  "srv/SetGyroBias.srv"
-  "srv/SetGyroBiasModel.srv"
-  "srv/SetGyroNoise.srv"
-  "srv/SetHardIronValues.srv"
-  "srv/SetHeadingSource.srv"
-  "srv/SetMagAdaptiveVals.srv"
-  "srv/SetMagDipAdaptiveVals.srv"
-  "srv/SetMagNoise.srv"
-  "srv/SetReferencePosition.srv"
-  "srv/SetRelativePositionReference.srv"
-  "srv/SetSensor2VehicleOffset.srv"
-  "srv/SetSensor2VehicleRotation.srv"
-  "srv/SetSoftIronMatrix.srv"
-  "srv/SetTareOrientation.srv"
-  "srv/SetZeroAngleUpdateThreshold.srv"
-  "srv/SetZeroVelocityUpdateThreshold.srv"
-  )
-
-rosidl_generate_interfaces(${PROJECT_NAME} ${srv_files} DEPENDENCIES std_msgs geometry_msgs)
-
+# Let the code know if it is being compiled with ROS1 or ROS2
+if(DEFINED ENV{ROS_VERSION})
+  add_definitions(-DMICROSTRAIN_ROS_VERSION=$ENV{ROS_VERSION})
+else()
+  message(FATAL_ERROR "ROS_VERSION environment variable is not set.")
+endif()
 
 ament_export_include_directories()
 ament_export_dependencies(    
@@ -115,9 +59,8 @@ ament_export_dependencies(
     sensor_msgs
     nav_msgs
     message_runtime
-		ros2_mscl_msgs
+		mscl_msgs
 )
-
 ament_package()
 
 ###########
@@ -125,12 +68,20 @@ ament_package()
 ###########
 
 
-include_directories(${CMAKE_SOURCE_DIR}/include/ros2_mscl ${MIPLIBINC} ${MIPUTILINC} ${MSCL_INC_PATH} ${MSCL_LIB} ${MSCL_INC} ${Boost_INCLUDE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/include ${COMMON_DIR}/include ${MSCL_INC_PATH} ${BOOST_INC_PATH})
 
 # Executables/Linking
-add_executable(ros2_mscl_node src/microstrain_3dm.cpp src/microstrain_3dm_node.cpp)
-ament_target_dependencies(ros2_mscl_node rclcpp rclcpp_lifecycle std_msgs std_srvs lifecycle_msgs sensor_msgs geometry_msgs nav_msgs tf2 tf2_ros tf2_geometry_msgs ros2_mscl_msgs) 
-rosidl_target_interfaces(ros2_mscl_node ${PROJECT_NAME} "rosidl_typesupport_cpp")
+add_executable(ros2_mscl_node
+  ${COMMON_DIR}/src/microstrain_subscribers.cpp
+  ${COMMON_DIR}/src/microstrain_publishers.cpp
+  ${COMMON_DIR}/src/microstrain_node_base.cpp
+  ${COMMON_DIR}/src/microstrain_services.cpp
+  ${COMMON_DIR}/src/microstrain_parser.cpp
+  ${COMMON_DIR}/src/microstrain_config.cpp
+  src/microstrain_3dm.cpp
+  src/microstrain_3dm_node.cpp
+)
+ament_target_dependencies(ros2_mscl_node rclcpp rclcpp_lifecycle std_msgs std_srvs lifecycle_msgs sensor_msgs geometry_msgs nav_msgs tf2 tf2_ros tf2_geometry_msgs mscl_msgs) 
 target_link_libraries(ros2_mscl_node ${MSCL_LIB_PATH})
 
 #############
@@ -161,7 +112,3 @@ install(DIRECTORY
 #  find_package(ament_lint_auto REQUIRED)
 #  ament_lint_auto_find_test_dependencies()
 #endif()
-
-## Run roslint on only the node files for now
-# TODO: Add more files as needed
-# roslint_cpp(src/microstrain_3dm.cpp src/microstrain_3dm_node.cpp)

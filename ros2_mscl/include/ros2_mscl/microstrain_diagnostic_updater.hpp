@@ -2,7 +2,7 @@
 #include "diagnostic_updater/msg/diagnostic_updater.h"
 #include "diagnostic_updater/msg/publisher.h"
 #include "mscl_msgs/Status.h"
-#include "include/microstrain_3dm.hpp"
+#include "ros2_mscl/microstrain_3dm.hpp"
 
 #include <string>
 

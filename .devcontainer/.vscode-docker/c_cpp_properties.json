@@ -4,10 +4,14 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/opt/ros/**",
-                "/usr/share/c++-mscl/source/**"
+                "${workspaceFolder}/install/ros2_mscl_msgs/**",
+                "/opt/ros/galactic/**",
+                "/usr/share/c++-mscl/**",
+                "/home/ros_mscl/include/ros_mscl"
             ],
-            "defines": [],
+            "defines": [
+                "MICROSTRAIN_ROS_VERSION=2"
+            ],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "gnu17",
             "cppStandard": "gnu++14",

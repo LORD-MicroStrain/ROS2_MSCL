@@ -66,6 +66,7 @@ build-shell: $(dev_image_artifact)
 		--privileged \
 		$(run_args) \
 		$(run_mounts) \
+		-v "/home/rob/Projects/LORD-MicroStrain/ROS-MSCL/ros_mscl:$(docker_catkin_root)/../ros_mscl" \
 		$$(cat $<)
 
 $(artifacts_dir):

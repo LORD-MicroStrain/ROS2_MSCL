@@ -8,28 +8,8 @@ RUN set -ex \
         gdb \
         git
 
-# Install MSCL (github deb install is kind of a pain)
-ENV DEBIAN_FRONTEND="noninteractive"
-RUN set -ex \
-    && apt-get update && apt-get install -y \
-        jq \
-        curl \
-    && install_github_deb () { \
-        org="${1}"; \
-        repo="${2}"; \
-        tag="${3}"; \
-        artifact="${4}"; \
-        list_asset_url="https://api.github.com/repos/${org}/${repo}/releases/tags/${tag}"; \
-        asset_url=$(curl -fsSl "${list_asset_url}" | jq ".assets[] | select(.name==\"${artifact}\") | .url" | sed 's/\"//g'); \
-        curl -fsSLJ -H 'Accept: application/octet-stream' "${asset_url}" -o "/tmp/${artifact}"; \
-        dpkg -i "/tmp/${artifact}" || apt-get install -f; \
-        rm -f "/tmp/${artifact}"; \
-    } \
-    && install_github_deb "LORD-MicroStrain"  "MSCL" "v62.0.0" "c++-mscl_62.0.0_amd64.deb"
-
 # Use rosdep to install the dependencies of the packages
-COPY ros2_mscl /tmp/src/ros2_mscl
-COPY mscl_msgs /tmp/src/mscl_msgs
+COPY . /tmp/src/
 RUN set -ex \
     && rosdep install --from-paths /tmp/src --ignore-src -r -y \
     && rm -rf /tmp/src
@@ -39,12 +19,12 @@ ARG USER_ID=1000
 ARG GROUP_ID=1000
 RUN set -ex \
     && groupadd -g ${USER_ID} microstrain \
-    && useradd -N -m -u ${USER_ID} -g ${GROUP_ID} -G "dialout" microstrain
+    && useradd -N -m -u ${USER_ID} -g ${GROUP_ID} -G "dialout" -s "/bin/bash" microstrain
 
 # Make the directory where we will mount all the files into
 USER microstrain
-RUN set -ex \
-    && mkdir -p ${HOME}/src
-
-# Add the MSCL path to LD_LIBRARY_PATH so that the linker can find it at runtime
-ENV LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/usr/share/c++-mscl"
+RUN echo "source /opt/ros/\${ROS_DISTRO}/setup.bash" >> ${HOME}/.bashrc
+RUN mkdir -p ${HOME}/catkin_ws/src
+RUN mkdir -p ${HOME}/catkin_ws/log
+RUN mkdir -p ${HOME}/catkin_ws/build
+RUN mkdir -p ${HOME}/catkin_ws/install

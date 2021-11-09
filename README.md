@@ -1,7 +1,8 @@
+## DEPRECATION NOTICE
+
+**IMPORTANT**: This repo has been replaced by the [ros2](https://github.com/LORD-MicroStrain/microstrain_inertial/tree/ros2) branch of the `microstrain_inertial` repo.
+
 ## Description
-
-IMPORTANT:  This is a beta release of the ROS2 driver!  Please report any issues via the [Github issues page](https://github.com/LORD-MicroStrain/ROS2_MSCL/issues)
-
 
 This is the ROS2 Interface (driver) software for inertial sensors compatible with the [Microstrain Communication Library (MSCL)](https://github.com/LORD-MicroStrain/MSCL).
 
